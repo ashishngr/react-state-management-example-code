@@ -1,13 +1,13 @@
-import { useState, useReducer, useMemo } from "react";
+import { useState, useReducer, useMemo, useEffect, useRef } from "react";
 
 
-function SortedList({list}){
-  const sortedList = useMemo(()=>{
-    console.log("running  sort");
-    return [...list].sort();
-  },[list])
-  return <div>{sortedList.join(",")}</div>
-}
+// function SortedList({list}){
+//   const sortedList = useMemo(()=>{
+//     console.log("running  sort");
+//     // return [...list].sort();
+//   },[list])
+//   return <div>{sortedList.join(",")}</div>
+// }
 
 
 //  useState ----
@@ -58,6 +58,46 @@ function Counter() {
 
 
 function  App(){
+// useRef
+const inputRef = useRef(null);
+useEffect(()=>{
+  inputRef.current.focus()
+},[]);
+
+const idRef = useRef(1);
+
+const [newName, setNewName] = useState([{
+  id: idRef.current++, name: "jon",
+  id: idRef.current++, name: "jane"
+}]);
+
+const addNewName = () => {
+  setNewName([...newName, 
+    {
+      id: idRef.current++,
+      newName: inputRef.current.value
+    }
+  ])
+  inputRef.current.value = ""
+};
+  
+
+
+
+
+
+
+  // useEffect 
+  const [strings, setStrings] = useState([]);
+  useEffect(()=>{
+    fetch("/names.json")
+    .then((response)=> response.json)
+    .then((data)=> setStrings(data));
+  }, [])
+  
+
+
+
   const [ state, dispatch ] = useReducer((state, action)=>{
     switch(action.type){
       case "SET_REDUCER_NAME": 
@@ -101,11 +141,25 @@ function  App(){
     <div id="useMemoAndUseCallback">
         <div>Names: {names.join(",")}</div>
         {/* <div>Sorted Names: {sortedNames.join(",")}</div> */}
-        <SortedList names={names}/>
+        {/* <SortedList names={names}/> */}
         <button onClick={()=>setCount1(count1 + 1)}>count1: {count1}</button>
         <button onClick={()=>setCount2(count2 + 1)}>count2: {count2}</button>
         <div>Total Count: {countTotal}</div>
     </div>
+    <div className="useEffect">
+        Strings
+    </div>
+    <div>
+      <div>
+        {newName.map((newName)=> (
+          <div key={newName.newName}>{newName.newName}</div>
+        ))}
+      </div>
+      <input type="text" ref={inputRef}/>
+      <button
+      onClick={addNewName}>Add New Name</button>
+    </div>
+
     </>
   )
 }
